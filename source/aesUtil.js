@@ -1,3 +1,4 @@
+// 加密解密工具类
 class AesUtil {
   static defaultKey = "my-secret-key-123";
   constructor(key) {

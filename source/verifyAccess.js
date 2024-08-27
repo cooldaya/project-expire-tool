@@ -1,5 +1,6 @@
+//  验证访问码是否有效
 (function () {
- document.documentElement.setAttribute("hidden", true);
+  document.documentElement.setAttribute("hidden", true);
   let timer = null;
   const interval = 1000 * 60 * 60; // 每隔1小时刷新一次页面
   const setInvisible = () => {
