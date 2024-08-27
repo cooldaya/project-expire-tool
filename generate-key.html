@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AES Encryption</title>
+  <script src="./lib/aesUtil.js"></script>
+  <style>
+    #encrypted-bday {
+      font-size: 1.5em;
+      padding: 10px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: solid 1px #36b3fc;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+
+    }
+
+    #encrypted-bday::after {
+      content: attr(data-tip);
+      position: absolute;
+      white-space: nowrap;
+      right: 0;
+      top: 0;
+      font-size: 12px;
+      color: #36fc46;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <form action="">
+    <label>
+      <span>项目名称：</span> <input type="text" name="name" oninput="ops.changeName(event)" />
+    </label>
+    <label>
+      <span>过期时间:</span> <input type="date" name="bday" oninput="ops.changeDate(event)" />
+    </label>
+    <p>访问码: <span id="encrypted-bday" onclick="ops.copyToClipboard()"></span></p>
+
+
+  </form>
+
+  <script>
+
+    const ops = {
+      payload: {
+        name: 'kt项目',
+        expire: Date.now()
+      },
+      access_code: '',
+      changeDate: async (e) => {
+        ops.payload.expire = new Date(e.target.value).getTime();
+        ops.generateAccessCode();
+
+      },
+      changeName: async (e) => {
+        ops.payload.name = e.target.value;
+        ops.generateAccessCode();
+      },
+      generateAccessCode: async () => {
+        const aesUtil = await AesUtil.getAesUtil();
+        const encryptedString = await aesUtil.encrypt(ops.payload);
+        const el = document.getElementById('encrypted-bday');
+        el.textContent = encryptedString;
+        ops.access_code = encryptedString;
+        el.dataset.tip = '点击复制'
+
+      },
+      copyToClipboard: async () => {
+        await navigator.clipboard.writeText(ops.access_code);
+        alert('访问码已复制到剪贴板');
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>
