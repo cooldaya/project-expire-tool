@@ -2,8 +2,7 @@ import * as esbuild from "esbuild";
 import JavaScriptObfuscator from "javascript-obfuscator";
 import fs from "node:fs";
 
-// 打包并混淆
-
+//打包配置
 const buildConfig = {
   entryPoints: ["src/aes-util.js", "src/a-verify.js"],
   bundle: true,
@@ -13,6 +12,7 @@ const buildConfig = {
   outdir: "public",
 };
 
+// 混淆配置
 const confoundConfig = {
   compact: true,
   controlFlowFlattening: true,
