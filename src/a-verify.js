@@ -1,4 +1,4 @@
-
+import AesUtil from "./aes-util";
 //  验证访问码是否有效
 function verifyAccessCode() {
   document.documentElement.setAttribute("hidden", true);

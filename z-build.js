@@ -3,40 +3,34 @@ import JavaScriptObfuscator from "javascript-obfuscator";
 import fs from "node:fs";
 
 // 打包并混淆
-const buildAndObfuscate = (config = {}) => {
-  const { outfile } = config;
-  esbuild
-    .build({
-      bundle: true,
-      minify: true,
-      sourcemap: false,
-      ...config,
-    })
-    .then((res) => {
-      // 读取打包后的文件
-      const code = fs.readFileSync(outfile, "utf8");
-      const obfuscationResult = JavaScriptObfuscator.obfuscate(code, {
-        compact: true,
-        controlFlowFlattening: true,
-        stringArray: true,
-        selfDefending: true,
-        stringArrayRotate: true,
-        disableConsoleOutput:true,
-      });
-      // 将混淆后的代码写入输出文件
-      fs.writeFileSync(outfile, obfuscationResult.getObfuscatedCode());
 
-      console.log("Obfuscation complete.");
-    });
+const buildConfig = {
+  entryPoints: ["src/aes-util.js", "src/a-verify.js"],
+  bundle: true,
+  minify: true,
+  sourcemap: false,
+  write: false,
+  outdir: "public",
 };
 
-buildAndObfuscate({
-  entryPoints: ["main.js"],
-  outfile: "dist/a-verify.js",
-});
+const confoundConfig = {
+  compact: true,
+  controlFlowFlattening: true,
+  stringArray: true,
+  selfDefending: true,
+  stringArrayRotate: true,
+  disableConsoleOutput: true,
+};
 
-buildAndObfuscate({
-  entryPoints: ["src/aesUtil.js"],
-  outfile: "dist/aes-util.js",
+esbuild.build(buildConfig).then((res) => {
+  const outputFiles = res.outputFiles || [];
+  outputFiles.forEach((fileInfo, index) => {
+    const { text, path } = fileInfo;
+    const obfuscationResult = JavaScriptObfuscator.obfuscate(
+      text,
+      confoundConfig
+    );
+    fs.writeFileSync(path, obfuscationResult.getObfuscatedCode());
+    console.log(`${index + 1}/${outputFiles.length} Obfuscating ${path}...`);
+  });
 });
-
