@@ -68,3 +68,6 @@ class AesUtil {
     return aesUtil;
   }
 }
+window.AesUtil = AesUtil;
+
+export default AesUtil;
