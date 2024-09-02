@@ -1,4 +1,4 @@
-import AesUtil from "./aes-util";
+import AesUtil from "./aes-util.js";
 //  验证访问码是否有效
 function verifyAccessCode() {
   document.documentElement.setAttribute("hidden", true);
@@ -109,4 +109,4 @@ function verifyAccessCode() {
   };
   window.addEventListener("DOMContentLoaded", checkAccessCode);
 }
-export default verifyAccessCode;
+verifyAccessCode();
