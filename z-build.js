@@ -19,7 +19,7 @@ const confoundConfig = {
   stringArray: true,
   selfDefending: true,
   stringArrayRotate: true,
-  disableConsoleOutput: true,
+  disableConsoleOutput: false,
 };
 
 esbuild.build(buildConfig).then((res) => {

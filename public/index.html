@@ -34,16 +34,18 @@
 <body>
   <form action="">
     <label>
-      <span>项目名称：</span> <input type="text" name="name" oninput="ops.changeName(event)" />
+      <span>项目名称：</span> <input type="text" name="name" oninput="ops.changeName(event)" placeholder="kt项目" />
     </label>
     <label>
       <span>过期时间:</span> <input type="date" name="bday" oninput="ops.changeDate(event)" />
+      <span>(持续 <span class="expire-day">15</span>天)</span>
+
     </label>
     <p>访问码: <span id="encrypted-bday" onclick="ops.copyToClipboard()"></span></p>
     <div><a href="./test.html">test 网站</a></div>
-    
-    <div><a href="./a-verify.js" download="a-verify.js">a-verify.js</a>  引入项目 在引入之前设置window.access_code</div>
-    
+
+    <div><a href="./a-verify.js" download="a-verify.js">a-verify.js</a> 引入项目 在引入之前设置window.access_code</div>
+
 
   </form>
 
@@ -52,11 +54,14 @@
     const ops = {
       payload: {
         name: 'kt项目',
-        expire: Date.now()
+        expire: Date.now() + 15 * 24 * 60 * 60 * 1000 // 15 days
       },
       access_code: '',
       changeDate: async (e) => {
-        ops.payload.expire = new Date(e.target.value).getTime();
+        const expire = e.target.value;
+        if (!expire) alert('过期时间不可为空');
+        ops.setDate(expire)
+        ops.payload.expire = new Date(expire).getTime();
         ops.generateAccessCode();
 
       },
@@ -65,6 +70,7 @@
         ops.generateAccessCode();
       },
       generateAccessCode: async () => {
+        // if([ops.payload.name,ops.payload.expire].some(v=>Boolean(v))) return alert('请输入项目名称和过期时间');
         const aesUtil = await AesUtil.getAesUtil();
         const encryptedString = await aesUtil.encrypt(ops.payload);
         const el = document.getElementById('encrypted-bday');
@@ -76,8 +82,33 @@
       copyToClipboard: async () => {
         await navigator.clipboard.writeText(ops.access_code);
         alert('访问码已复制到剪贴板');
+      },
+      formatDateFn: async (date) => {
+        const today = date ? new Date(date) : new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      },
+      setDate: async (date) => {
+        const tDate = new Date(date || ops.payload.expire);
+        const formattedDate = await ops.formatDateFn(tDate)
+        const bdayel = document.querySelector('input[name="bday"]');
+        bdayel.setAttribute('min', await ops.formatDateFn());
+        bdayel.value = formattedDate;
+
+        document.querySelector('.expire-day').textContent = Math.ceil((tDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+      },
+      setName: async (name) => {
+        document.querySelector('input[name="name"]').value = name || ops.payload.name;
+      },
+      initDefaultValues: async () => {
+        ops.setName();
+        ops.setDate();
+        ops.generateAccessCode();
       }
     }
+    ops.initDefaultValues();
 
   </script>
 
